@@ -1,0 +1,120 @@
+
+#
+# With multiplier defaulting to 6 (maximum number of azs), there should
+# be 42 allocations
+# 0 - 10 should ne network
+# 10 - 20 should be database / caching
+# 20 - 30 should be compute resources
+# 30 - 42 is left empty for arbitrary use
+#
+maximum_availability_zones: 5
+component_version: 1.0.3
+subnets:
+  vpc_public:
+    allocation: 0
+    name: Public
+    type: public
+
+enable_transit_vpc: false
+
+securityGroups:
+  ops:
+    -
+      rules:
+        -
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        -
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        -
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+      ips:
+        - ops
+  dev:
+    -
+      rules:
+        -
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        -
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        -
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+      ips:
+        - dev
+  backplane:
+    -
+      rules:
+        -
+          IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+        -
+          IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+        -
+          IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+        -
+          IpProtocol: tcp
+          FromPort: 25
+          ToPort: 25
+        -
+          IpProtocol: tcp
+          FromPort: 3389
+          ToPort: 3389
+        -
+          IpProtocol: udp
+          FromPort: 123
+          ToPort: 123
+        -
+          IpProtocol: udp
+          FromPort: 123
+          ToPort: 123
+      ips:
+        - stack
+    -
+      rules:
+        -
+          IpProtocol: tcp
+          FromPort: 5666
+          ToPort: 5666
+      ips:
+        - monitoring
+
+ip_blocks:
+  public:
+    - 0.0.0.0/0
+  ops:
+    - 169.254.100.100/32
+  dev:
+    - 169.254.100.100/32
+  monitoring:
+    - 169.254.100.100/32
+
+##### Configuration export or exported configuration (config_export) as key compared to (export_config) in template that means
+##### Configuration OF export (or export configuration)
+managed_accounts:
+  ops:
+    local: true
+
+config_export:
+  global:
+    - maximum_availability_zones
+
+lib_export:
+  global:
+    cfndsl:
+      - az
