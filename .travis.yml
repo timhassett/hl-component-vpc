@@ -1,0 +1,6 @@
+language: ruby
+rvm:
+  - 2.3
+script:
+  - gem install cfhighlander --prerelease
+  - AWS_REGION=us-east-1 cfhighlander cfcompile --validate
