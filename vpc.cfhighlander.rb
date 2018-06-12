@@ -2,7 +2,7 @@
 ## 1. embed parameters in modules and set default values
 ## 2. expose metadata for highlander assembly to assemble master template
 
-HighlanderComponent do
+CfhighlanderTemplate do
 
   Name 'VPC'
   Description "Highlander VPC component #{component_version}"
@@ -15,10 +15,10 @@ HighlanderComponent do
 
     # Param with default value inside module config
     # but also exposed as top-level parameter
-    StackParam 'EnvironmentType', isGlobal: true
-    StackParam 'EnvironmentName', isGlobal: true
-    StackParam 'StackOctet', 10
-    StackParam 'NetworkPrefix', 10
+    ComponentParam 'EnvironmentType', isGlobal: true
+    ComponentParam 'EnvironmentName', isGlobal: true
+    ComponentParam 'StackOctet', 10
+    ComponentParam 'NetworkPrefix', 10
 
     # Param with default value inside module config
     # but not exposed as top level parameter. Default config
@@ -26,7 +26,7 @@ HighlanderComponent do
     ComponentParam 'StackMask', '16'
 
     if enable_transit_vpc
-      StackParam 'EnableTransitVPC', 'false', isGlobal: true
+      ComponentParam 'EnableTransitVPC', 'false', isGlobal: true
     end
 
     # Account mappings for AZs
@@ -43,7 +43,7 @@ HighlanderComponent do
 
       end
 
-      StackParam "Nat#{az}EIPAllocationId", 'dynamic'
+      ComponentParam "Nat#{az}EIPAllocationId", 'dynamic'
 
     end
 
