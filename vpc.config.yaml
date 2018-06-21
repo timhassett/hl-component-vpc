@@ -14,6 +14,18 @@ subnets:
     allocation: 0
     name: Public
     type: public
+  compute:
+    allocation: 1
+    name: Compute
+    type: private
+  persistence:
+    allocation: 2
+    name: Persistence
+    type: private
+  cache:
+    allocation: 3
+    name: Cache
+    type: private
 
 enable_transit_vpc: false
 
