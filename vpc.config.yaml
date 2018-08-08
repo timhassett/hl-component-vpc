@@ -29,6 +29,34 @@ subnets:
 
 enable_transit_vpc: false
 
+## Port numbers https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+public_acl_rules:
+  inbound:
+    -
+      number: 50
+      from: 1024
+      to: 65535
+    -
+      number: 51
+      from: 22
+    -
+      number: 52
+      from: 80
+    -
+      number: 53
+      from: 443
+    -
+      number: 54
+      protocol: 17
+      from: 1024
+      to: 65535
+  outbound:
+    -
+      number: 50
+      protocol: -1
+      from: 1024
+      to: 65535
+
 securityGroups:
   ops:
     -
