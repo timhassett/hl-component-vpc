@@ -17,13 +17,13 @@ CfhighlanderTemplate do
     # but also exposed as top-level parameter
     ComponentParam 'EnvironmentType', isGlobal: true
     ComponentParam 'EnvironmentName', isGlobal: true
-    ComponentParam 'StackOctet', 10
-    ComponentParam 'NetworkPrefix', 10
+    ComponentParam 'StackOctet', 10, isGlobal: true
+    ComponentParam 'NetworkPrefix', 10, isGlobal: true
 
     # Param with default value inside module config
     # but not exposed as top level parameter. Default config
     # can be overwritten
-    ComponentParam 'StackMask', '16'
+    ComponentParam 'StackMask', '16', isGlobal: true
 
     if enable_transit_vpc
       ComponentParam 'EnableTransitVPC', 'false', isGlobal: true
