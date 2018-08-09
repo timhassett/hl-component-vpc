@@ -29,7 +29,16 @@ subnets:
 
 enable_transit_vpc: false
 
-## Port numbers https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml
+#
+# NACL Rules
+#
+# number: 50 - Rule number, rules must have different number values
+# protocol: -1 - Port number (https://www.iana.org/assignments/protocol-numbers/protocol-numbers.xhtml)
+# action: allow|deny - default is allow if key is not set
+# cidr: 0.0.0.0/0 - default is 0.0.0.0/0 if no value is set
+# from: 1024 - start of the port range, if just a single port just specify `from`
+# to: 65535 - end of the port range
+
 public_acl_rules:
   inbound:
     -

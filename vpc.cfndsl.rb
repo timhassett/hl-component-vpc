@@ -64,7 +64,7 @@ CloudFormation do
         NetworkAclId Ref('PublicNetworkAcl')
         RuleNumber entry['number']
         Protocol entry['protocol'] || '6'
-        RuleAction (entry['allow'] ? 'allow' : 'deny')
+        RuleAction entry['action'] || 'allow'
         Egress (type == 'outbound' ? true : false)
         CidrBlock entry['cidr'] || '0.0.0.0/0'
         PortRange ({ From: entry['from'], To: entry['to'] || entry['from'] })
