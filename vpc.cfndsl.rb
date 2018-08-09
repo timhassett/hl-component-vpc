@@ -58,28 +58,18 @@ CloudFormation do
     VpcId Ref('VPC')
   end
 
-  acls = {
-      # Inbound rules
-      InboundEphemeralPublicNetworkAclEntry:    ['100','6','allow','false','0.0.0.0/0','1024','65535'],
-      InboundSSHPublicNetworkAclEntry:          ['101','6','allow','false','0.0.0.0/0','22','22'],
-      InboundHTTPPublicNetworkAclEntry:         ['102','6','allow','false','0.0.0.0/0','80','80'],
-      InboundHTTPSPublicNetworkAclEntry:        ['103','6','allow','false','0.0.0.0/0','443','443'],
-      InboundNTPPublicNetworkAclEntry:          ['104','17','allow','false','0.0.0.0/0','123','123'],
-      InboundUDPEphemeralPublicNetworkAclEntry: ['105','17','allow','false','0.0.0.0/0','1024','65535'],
-      # Outbound rules
-      OutboundNetworkAclEntry:                ['100','-1','allow','true','0.0.0.0/0','0','65535']
-  }
-  acls.each do |alcName,alcProperties|
-    Resource(alcName) {
-      Type 'AWS::EC2::NetworkAclEntry'
-      Property('NetworkAclId', Ref('PublicNetworkAcl'))
-      Property('RuleNumber', alcProperties[0])
-      Property('Protocol', alcProperties[1])
-      Property('RuleAction', alcProperties[2])
-      Property('Egress', alcProperties[3])
-      Property('CidrBlock', alcProperties[4])
-      Property('PortRange',{ From: alcProperties[5], To: alcProperties[6] })
-    }
+  public_acl_rules.each do |type,entries|
+    entries.each do |entry|
+      EC2_NetworkAclEntry("#{type}#{entry['number']}") {
+        NetworkAclId Ref('PublicNetworkAcl')
+        RuleNumber entry['number']
+        Protocol entry['protocol'] || '6'
+        RuleAction entry['action'] || 'allow'
+        Egress (type == 'outbound' ? true : false)
+        CidrBlock entry['cidr'] || '0.0.0.0/0'
+        PortRange ({ From: entry['from'], To: entry['to'] || entry['from'] })
+      }
+    end
   end
 
   # Public subnets route table
@@ -233,5 +223,3 @@ CloudFormation do
   }
 
 end
-
-
