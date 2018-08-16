@@ -212,14 +212,27 @@ CloudFormation do
   end
 
   # Outputs
-  Output("VPCId") { Value(Ref('VPC')) }
-  Output("SecurityGroupOps") { Value(Ref('SecurityGroupOps')) }
-  Output("SecurityGroupDev") { Value(Ref('SecurityGroupDev')) }
-  Output("SecurityGroupBackplane") { Value(Ref('SecurityGroupBackplane')) }
+  Output("VPCId") {
+    Value(Ref('VPC'))
+    Export FnSub("${EnvironmentName}-#{component_name}-VPCId")
+  }
+  Output("SecurityGroupOps") {
+    Value(Ref('SecurityGroupOps'))
+    Export FnSub("${EnvironmentName}-#{component_name}-SecurityGroupOps")
+  }
+  Output("SecurityGroupDev") {
+    Value(Ref('SecurityGroupDev'))
+    Export FnSub("${EnvironmentName}-#{component_name}-SecurityGroupDev")
+  }
+  Output("SecurityGroupBackplane") {
+    Value(Ref('SecurityGroupBackplane'))
+    Export FnSub("${EnvironmentName}-#{component_name}-SecurityGroupBackplane")
+  }
 
   nat_ip_list = nat_gateway_ips_list_internal(maximum_availability_zones)
   Output('NatGatewayIps') {
     Value(FnJoin(',', nat_ip_list))
+    Export FnSub("${EnvironmentName}-#{component_name}-NatGatewayIps")
   }
 
 end
