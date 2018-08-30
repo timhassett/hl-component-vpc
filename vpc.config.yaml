@@ -42,26 +42,26 @@ enable_transit_vpc: false
 public_acl_rules:
   inbound:
     -
-      number: 50
+      number: 100
+      from: 22
+    -
+      number: 200
+      from: 80
+    -
+      number: 300
+      from: 443
+    -
+      number: 400
       from: 1024
       to: 65535
     -
-      number: 51
-      from: 22
-    -
-      number: 52
-      from: 80
-    -
-      number: 53
-      from: 443
-    -
-      number: 54
+      number: 500
       protocol: 17
       from: 1024
       to: 65535
   outbound:
     -
-      number: 50
+      number: 100
       protocol: -1
       from: 1024
       to: 65535

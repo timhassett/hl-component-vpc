@@ -17,6 +17,10 @@ def sg_create_rules (security_groups, ip_blocks={})
 end
 
 
+def lookup_ips(ips, block_name)
+  return  lookup_ips_for_sg(ips, block_name)
+end
+
 def lookup_ips_for_sg (ips, ip_block_name={})
   cidr = []
   if ip_block_name == 'stack'
