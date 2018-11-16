@@ -236,7 +236,6 @@ CloudFormation do
   nat_ip_list = nat_gateway_ips_list_internal(maximum_availability_zones)
   Output('NatGatewayIps') {
     Value(FnJoin(',', nat_ip_list))
-    Export FnSub("${EnvironmentName}-#{component_name}-NatGatewayIps")
   }
 
 end
