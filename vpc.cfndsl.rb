@@ -14,7 +14,16 @@ CloudFormation do
     ]))
   end
 
+  tags = []
+  tags << { Key: 'Environment', Value: Ref(:EnvironmentName) }
+  tags << { Key: 'EnvironmentType', Value: Ref(:EnvironmentType) }
+  extra_tags.each { |key,value| tags << { Key: key, Value: value } } if defined? extra_tags
+
+
   # VPC Itself
+  vpc_tags = []
+  vpc_tags += tags
+  vpc_tags << { Key: 'Name', Value: FnSub('${EnvironmentName}-vpc') }
   VPC('VPC') do
     CidrBlock(
         FnJoin('',
@@ -27,14 +36,21 @@ CloudFormation do
     )
     EnableDnsSupport true
     EnableDnsHostnames true
+    Tags vpc_tags
   end
 
   dns_domain = FnJoin('.', [
       Ref('EnvironmentName'), Ref('DnsDomain')
   ])
 
-  Route53_HostedZone('HostedZone') do
-    Name dns_domain
+  unless manage_ns_records
+    Route53_HostedZone('HostedZone') do
+      Name dns_domain
+      HostedZoneConfig ({
+        Comment: FnSub("Hosted Zone for ${EnvironmentName}")
+      })
+      HostedZoneTags tags
+    end
   end
 
   EC2_DHCPOptions('DHCPOptionSet') do
