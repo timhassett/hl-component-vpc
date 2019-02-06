@@ -236,6 +236,10 @@ CloudFormation do
     Value(Ref('VPC'))
     Export FnSub("${EnvironmentName}-#{component_name}-VPCId")
   }
+  Output("VPCCidr") {
+    Value(FnGetAtt('VPC', 'CidrBlock'))
+    Export FnSub("${EnvironmentName}-#{component_name}-VPCCidr")
+  }
   Output("SecurityGroupOps") {
     Value(Ref('SecurityGroupOps'))
     Export FnSub("${EnvironmentName}-#{component_name}-SecurityGroupOps")
