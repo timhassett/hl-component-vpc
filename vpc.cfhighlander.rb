@@ -5,7 +5,6 @@
 CfhighlanderTemplate do
 
   Name 'VPC'
-  Description "Highlander VPC component #{component_version}"
   ComponentVersion component_version
   ComponentDistribution 's3://source.highlander.base2.services/components'
 
