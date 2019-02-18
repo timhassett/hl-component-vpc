@@ -139,7 +139,6 @@ def az_create_subnets(subnet_allocation, subnet_name, type = 'private', vpc = 'V
         RouteTableId Ref('RouteTablePublic')
       end
     end
-    Output(subnet_name_az) { Value(FnIf("Az#{az}", Ref(subnet_name_az), '')) }
     subnets << "#{subnet_name}#{az}"
   end
 
