@@ -175,8 +175,9 @@ CloudFormation do
       end
       subnetRefs << Ref(subnet_name_az)
     end
+    subnet_list = az_conditional_resources_internal("Subnet#{config['name']}",maximum_availability_zones)
     Output("#{config['name']}Subnets") {
-      Value(FnJoin(',', subnetRefs))
+      Value(FnJoin(',', subnet_list))
       Export FnSub("${EnvironmentName}-#{component_name}-#{config['name']}Subnets")
     }
   }
