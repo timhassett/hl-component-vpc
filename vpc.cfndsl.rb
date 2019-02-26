@@ -289,9 +289,7 @@ CloudFormation do
             {
               Effect: 'Allow',
               Principal: {  
-                Service: [ 
-                  "ec2.amazonaws.com"  
-                ]
+                Service: 'vpc-flow-logs.amazonaws.com'
               },
               Action: [ 'sts:AssumeRole' ]
             }
@@ -305,11 +303,11 @@ CloudFormation do
                   {
                       Effect: 'Allow',
                       Action: [
-                          "logs:CreateLogGroup",
-                          "logs:CreateLogStream",
-                          "logs:DescribeLogGroups",
-                          "logs:DescribeLogStreams",
-                          "logs:PutLogEvents"
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams"
                       ],
                       Resource: '*'
                   }
