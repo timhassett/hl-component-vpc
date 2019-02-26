@@ -170,7 +170,7 @@ CloudFormation do
     newSubnets.each_with_index do |subnet_name,az|
       subnet_name_az = "Subnet#{subnet_name}"
       Output("Subnet#{subnet_name}") do
-        Value(FnIf("Az#{az}", Ref(subnet_name_az), "AWS::NoValue"))
+        Value(FnIf("Az#{az}", Ref(subnet_name_az), ''))
         Export FnSub("${EnvironmentName}-#{component_name}-#{subnet_name_az}")
       end
       subnetRefs << Ref(subnet_name_az)
