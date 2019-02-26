@@ -321,7 +321,7 @@ CloudFormation do
   
 
     EC2_FlowLog("VPCFlowLogs") do
-      DeliverLogsPermissionArn Ref('PutVPCFlowLogsRole')
+      DeliverLogsPermissionArn FnGetAtt('PutVPCFlowLogsRole', 'Arn')
       #LogDestination FnGetAtt('LogGroup', 'Arn')
       #LogDestinationType  'cloud-watch-logs'
       LogGroupName Ref('LogGroup')
