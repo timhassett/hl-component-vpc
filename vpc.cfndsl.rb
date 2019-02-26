@@ -170,7 +170,8 @@ CloudFormation do
     newSubnets.each_with_index do |subnet_name,az|
       subnet_name_az = "Subnet#{subnet_name}"
       Output("Subnet#{subnet_name}") do
-        Value(FnIf("Az#{az}", Ref(subnet_name_az), ''))
+        Value(FnIf("Az#{az}", Ref(subnet_name_az), "AWS::NoValue"))
+        Export FnSub("${EnvironmentName}-#{component_name}-#{subnet_name_az}")
       end
       subnetRefs << Ref(subnet_name_az)
     end
@@ -270,5 +271,65 @@ CloudFormation do
   Output('NatGatewayIps') {
     Value(FnJoin(',', nat_ip_list))
   }
+
+
+  if defined?(flowlogs)
+    log_retention = 7 unless defined?(log_retention)
+
+    Resource('LogGroup') {
+      Type 'AWS::Logs::LogGroup'
+      Property('LogGroupName', Ref('AWS::StackName'))
+      Property('RetentionInDays', "#{log_retention}")
+    }
+
+
+
+    IAM_Role("PutVPCFlowLogsRole") do
+      AssumeRolePolicyDocument ({
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: {  
+                Service: [ 
+                  "ec2.amazonaws.com"  
+                ]
+              },
+              Action: [ 'sts:AssumeRole' ]
+            }
+          ]
+      })
+      Path '/'
+      Policies ([
+          PolicyName: 'PutVPCFlowLogsRole',
+          PolicyDocument: {
+              Statement: [
+                  {
+                      Effect: 'Allow',
+                      Action: [
+                          "logs:CreateLogGroup",
+                          "logs:CreateLogStream",
+                          "logs:DescribeLogGroups",
+                          "logs:DescribeLogStreams",
+                          "logs:PutLogEvents"
+                      ],
+                      Resource: '*'
+                  }
+              ]
+          }
+      ])
+    end
+  
+
+    EC2_FlowLog("VPCFlowLogs") do
+      DeliverLogsPermissionArn Ref('PutVPCFlowLogsRole')
+      #LogDestination FnGetAtt('LogGroup', 'Arn')
+      #LogDestinationType  'cloud-watch-logs'
+      LogGroupName Ref('LogGroup')
+      ResourceId Ref('VPC')
+      ResourceType 'VPC'
+      TrafficType 'ALL'
+    end
+  end
+
 
 end

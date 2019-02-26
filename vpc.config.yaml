@@ -175,3 +175,6 @@ lib_export:
   global:
     cfndsl:
       - az
+
+flowlogs: True
+
