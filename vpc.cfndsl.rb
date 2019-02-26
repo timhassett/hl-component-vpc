@@ -271,4 +271,61 @@ CloudFormation do
     Value(FnJoin(',', nat_ip_list))
   }
 
+
+  if defined?(flowlogs)
+    log_retention = (flowlogs.is_a?(Hash) && flowlogs.has_key?('log_retention')) ? flowlogs['log_retention'] : 7
+    
+
+    Resource('FlowLogsLogGroup') {
+      Type 'AWS::Logs::LogGroup'
+      Property('LogGroupName', Ref('AWS::StackName'))
+      Property('RetentionInDays', "#{log_retention}")
+    }
+
+
+
+    IAM_Role("PutVPCFlowLogsRole") do
+      AssumeRolePolicyDocument ({
+          Statement: [
+            {
+              Effect: 'Allow',
+              Principal: {  
+                Service: 'vpc-flow-logs.amazonaws.com'
+              },
+              Action: [ 'sts:AssumeRole' ]
+            }
+          ]
+      })
+      Path '/'
+      Policies ([
+          PolicyName: 'PutVPCFlowLogsRole',
+          PolicyDocument: {
+              Statement: [
+                  {
+                      Effect: 'Allow',
+                      Action: [
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents",
+                        "logs:DescribeLogGroups",
+                        "logs:DescribeLogStreams"
+                      ],
+                      Resource: '*'
+                  }
+              ]
+          }
+      ])
+    end
+  
+
+    EC2_FlowLog("VPCFlowLogs") do
+      DeliverLogsPermissionArn FnGetAtt('PutVPCFlowLogsRole', 'Arn')
+      LogGroupName Ref('FlowLogsLogGroup')
+      ResourceId Ref('VPC')
+      ResourceType 'VPC'
+      TrafficType (flowlogs.is_a?(Hash) && flowlogs.has_key?('traffic_type')) ? flowlogs['traffic_type'] : 'ALL'
+    end
+  end
+
+
 end

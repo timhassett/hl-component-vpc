@@ -1,0 +1,9 @@
+test_metadata:
+  type: config
+  name: VPC with flowlogs
+  description: VPC with vpc flow logs enabled for ACCEPT traffic
+
+
+flowlogs: 
+  traffic_type: ACCEPT
+  log_retention: 14
