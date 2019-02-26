@@ -176,5 +176,5 @@ lib_export:
     cfndsl:
       - az
 
-flowlogs: True
+#flowlogs: True
 
