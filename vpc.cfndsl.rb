@@ -160,12 +160,16 @@ CloudFormation do
   # Create defined subnets
   subnets.each {|name, config|
     subnetRefs = []
+    subnet_tags = []
+    subnet_tags += tags
+    config['tags'].each { |key,value| subnet_tags << { Key: key, Value: value } } if config.has_key?('tags')
     newSubnets = az_create_subnets(
         config['allocation'],
         config['name'],
         config['type'],
         'VPC',
-        maximum_availability_zones
+        maximum_availability_zones,
+        subnet_tags
     )
     newSubnets.each_with_index do |subnet_name,az|
       subnet_name_az = "Subnet#{subnet_name}"
@@ -204,6 +208,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Ops External Access'
       SecurityGroupIngress sg_create_rules(securityGroups['ops'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 
@@ -212,6 +223,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Dev Team Access'
       SecurityGroupIngress sg_create_rules(securityGroups['dev'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 
@@ -220,6 +238,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Backplane SG'
       SecurityGroupIngress sg_create_rules(securityGroups['backplane'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 

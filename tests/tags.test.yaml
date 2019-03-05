@@ -1,0 +1,13 @@
+test_metadata:
+  type: config
+  name: tags
+  description: add estra tags to resources
+
+extra_tags:
+  CostCenter: my cost center
+
+
+subnets:
+  compute:
+    tags:
+      kubernetes.io/role/internal-elb: 1
