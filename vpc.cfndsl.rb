@@ -158,11 +158,11 @@ CloudFormation do
 
 
   # Create defined subnets
-  subnets.each {|name, config|
+  subnets.each do |name, config|
     subnetRefs = []
     subnet_tags = []
     subnet_tags += tags
-    config['tags'].each { |key,value| subnet_tags << { Key: key, Value: value } } if config.has_key?('tags')
+    config['tags'].each { |key,value| subnet_tags << { Key: FnSub(key.to_s), Value: FnSub(value.to_s) } } if config.has_key?('tags')
     newSubnets = az_create_subnets(
         config['allocation'],
         config['name'],
@@ -183,7 +183,7 @@ CloudFormation do
       Value(FnJoin(',', subnet_list))
       Export FnSub("${EnvironmentName}-#{component_name}-#{config['name']}Subnets")
     }
-  }
+  end
 
   route_tables = az_conditional_resources_internal('RouteTablePrivate', maximum_availability_zones)
 
