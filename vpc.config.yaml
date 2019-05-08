@@ -32,9 +32,9 @@ enable_transit_vpc: false
 # Manage the NS Records for the VPCs public hosted zone
 # when `true` enables the propergation of NS record into either a parent
 # zone in the same account of via a custom resource another AWS account
-# requires a custom role in the other aws account allowing upsert 
+# requires a custom role in the other aws account allowing upsert
 # permissions to the parent zone
-manage_ns_records: false 
+manage_ns_records: false
 #is false by default for backward compatibilty
 
 #

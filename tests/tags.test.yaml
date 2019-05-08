@@ -1,0 +1,17 @@
+test_metadata:
+  type: config
+  name: tags
+  description: add estra tags to resources
+
+extra_tags:
+  CostCenter: my cost center
+
+
+subnets:
+  vpc_public:
+    tags:
+      kubernetes.io/cluster/${EnvironmentName}-eks-cluster: owned
+  compute:
+    tags:
+      kubernetes.io/role/internal-elb: 1
+      kubernetes.io/cluster/${EnvironmentName}-eks-cluster: owned

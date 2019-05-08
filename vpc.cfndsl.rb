@@ -158,14 +158,18 @@ CloudFormation do
 
 
   # Create defined subnets
-  subnets.each {|name, config|
+  subnets.each do |name, config|
     subnetRefs = []
+    subnet_tags = []
+    subnet_tags += tags
+    config['tags'].each { |key,value| subnet_tags << { Key: FnSub(key.to_s), Value: FnSub(value.to_s) } } if config.has_key?('tags')
     newSubnets = az_create_subnets(
         config['allocation'],
         config['name'],
         config['type'],
         'VPC',
-        maximum_availability_zones
+        maximum_availability_zones,
+        subnet_tags
     )
     newSubnets.each_with_index do |subnet_name,az|
       subnet_name_az = "Subnet#{subnet_name}"
@@ -179,7 +183,7 @@ CloudFormation do
       Value(FnJoin(',', subnet_list))
       Export FnSub("${EnvironmentName}-#{component_name}-#{config['name']}Subnets")
     }
-  }
+  end
 
   route_tables = az_conditional_resources_internal('RouteTablePrivate', maximum_availability_zones)
 
@@ -204,6 +208,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Ops External Access'
       SecurityGroupIngress sg_create_rules(securityGroups['ops'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 
@@ -212,6 +223,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Dev Team Access'
       SecurityGroupIngress sg_create_rules(securityGroups['dev'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 
@@ -220,6 +238,13 @@ CloudFormation do
       VpcId Ref('VPC')
       GroupDescription 'Backplane SG'
       SecurityGroupIngress sg_create_rules(securityGroups['backplane'], ip_blocks)
+      Metadata({
+        cfn_nag: {
+          rules_to_suppress: [
+            { id: 'F1000', reason: 'plan is to remove these security groups or make them conditional' }
+          ]
+        }
+      })
     end
   end
 
@@ -273,9 +298,10 @@ CloudFormation do
 
 
   if defined?(flowlogs)
-    log_retention = 7 unless defined?(log_retention)
+    log_retention = (flowlogs.is_a?(Hash) && flowlogs.has_key?('log_retention')) ? flowlogs['log_retention'] : 7
+    
 
-    Resource('LogGroup') {
+    Resource('FlowLogsLogGroup') {
       Type 'AWS::Logs::LogGroup'
       Property('LogGroupName', Ref('AWS::StackName'))
       Property('RetentionInDays', "#{log_retention}")
@@ -319,12 +345,10 @@ CloudFormation do
 
     EC2_FlowLog("VPCFlowLogs") do
       DeliverLogsPermissionArn FnGetAtt('PutVPCFlowLogsRole', 'Arn')
-      #LogDestination FnGetAtt('LogGroup', 'Arn')
-      #LogDestinationType  'cloud-watch-logs'
-      LogGroupName Ref('LogGroup')
+      LogGroupName Ref('FlowLogsLogGroup')
       ResourceId Ref('VPC')
       ResourceType 'VPC'
-      TrafficType 'ALL'
+      TrafficType (flowlogs.is_a?(Hash) && flowlogs.has_key?('traffic_type')) ? flowlogs['traffic_type'] : 'ALL'
     end
   end
 

@@ -101,17 +101,20 @@ def az_conditional_resources_array(resource_name, x = $maximum_availability_zone
   end
 end
 
-def az_create_subnets(subnet_allocation, subnet_name, type = 'private', vpc = 'VPC', x = $maximum_availability_zones)
+def az_create_subnets(subnet_allocation, subnet_name, type = 'private', vpc = 'VPC', x = $maximum_availability_zones, tags = [])
   subnets = []
   x.times do |az|
     subnet_name_az = "Subnet#{subnet_name}#{az}"
+    subnet_tags = []
+    subnet_tags += tags
+    subnet_tags << { Key: 'Name', Value: "#{subnet_name}#{az}" }
     Resource(subnet_name_az) do
       Condition "Az#{az}"
       Type 'AWS::EC2::Subnet'
       Property('VpcId', Ref(vpc.to_s))
       Property('CidrBlock', FnJoin('', ['10.', Ref('StackOctet'), ".#{subnet_allocation * x + az}.0/24"]))
       Property('AvailabilityZone', Ref("Az#{az}"))
-      Property('Tags', [{ Key: 'Name', Value: "#{subnet_name}#{az}" }])
+      Property('Tags', tags)
     end
 
     # Route table associations
